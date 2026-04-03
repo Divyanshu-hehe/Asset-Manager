@@ -3,13 +3,27 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: PathNexis AI API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: resume
+    description: Resume analysis
+  - name: roadmap
+    description: Learning roadmap generation
+  - name: mentors
+    description: Alumni mentor network
+  - name: referrals
+    description: Job referral marketplace
+  - name: interview
+    description: Mock interview
+  - name: dashboard
+    description: Dashboard summary data
 paths:
   /healthz:
     get:
@@ -24,7 +38,379 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/signup:
+    post:
+      operationId: signup
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Email already in use
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /resume/analyze:
+    post:
+      operationId: analyzeResume
+      tags: [resume]
+      summary: Analyze a resume and return score + suggestions
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResumeAnalyzeBody"
+      responses:
+        "200":
+          description: Resume analysis result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResumeAnalysis"
+
+  /resume/latest:
+    get:
+      operationId: getLatestResume
+      tags: [resume]
+      summary: Get the latest resume analysis for the current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Latest resume analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResumeAnalysis"
+        "404":
+          description: No resume found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /roadmap/generate:
+    post:
+      operationId: generateRoadmap
+      tags: [roadmap]
+      summary: Generate a personalized learning roadmap
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoadmapGenerateBody"
+      responses:
+        "200":
+          description: Generated roadmap
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Roadmap"
+
+  /roadmap/my:
+    get:
+      operationId: getMyRoadmap
+      tags: [roadmap]
+      summary: Get the current user's active roadmap
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Active roadmap
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Roadmap"
+        "404":
+          description: No roadmap found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /roadmap/progress:
+    patch:
+      operationId: updateRoadmapProgress
+      tags: [roadmap]
+      summary: Mark a skill as completed in the roadmap
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoadmapProgressBody"
+      responses:
+        "200":
+          description: Updated roadmap
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Roadmap"
+
+  /mentors:
+    get:
+      operationId: listMentors
+      tags: [mentors]
+      summary: List all mentors, optionally filtered by domain
+      parameters:
+        - name: domain
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of mentors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Mentor"
+
+  /mentors/{id}:
+    get:
+      operationId: getMentor
+      tags: [mentors]
+      summary: Get a specific mentor by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Mentor details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Mentor"
+        "404":
+          description: Mentor not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /mentors/{id}/connect:
+    post:
+      operationId: connectMentor
+      tags: [mentors]
+      summary: Request to connect with a mentor
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Connection request sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectionRequest"
+
+  /referrals:
+    get:
+      operationId: listReferrals
+      tags: [referrals]
+      summary: List all job referral openings
+      parameters:
+        - name: domain
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of job referrals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Referral"
+
+  /referrals/{id}/apply:
+    post:
+      operationId: applyReferral
+      tags: [referrals]
+      summary: Apply for a job referral
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Application submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReferralApplication"
+
+  /referrals/my-applications:
+    get:
+      operationId: getMyApplications
+      tags: [referrals]
+      summary: Get all referral applications by the current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of applications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReferralApplication"
+
+  /interview/start:
+    post:
+      operationId: startInterview
+      tags: [interview]
+      summary: Start a mock interview session
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InterviewStartBody"
+      responses:
+        "200":
+          description: Interview session started with questions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterviewSession"
+
+  /interview/submit:
+    post:
+      operationId: submitInterview
+      tags: [interview]
+      summary: Submit answers and get AI feedback
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InterviewSubmitBody"
+      responses:
+        "200":
+          description: Interview feedback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InterviewFeedback"
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary stats for the current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     HealthStatus:
       type: object
@@ -34,3 +420,470 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    SignupBody:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        college:
+          type: string
+        year:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - email
+        - password
+
+    LoginBody:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - token
+        - user
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        college:
+          type: ["string", "null"]
+        year:
+          type: ["string", "null"]
+        skills:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - email
+        - skills
+        - createdAt
+
+    ResumeAnalyzeBody:
+      type: object
+      properties:
+        content:
+          type: string
+        targetRole:
+          type: ["string", "null"]
+      required:
+        - content
+
+    ResumeAnalysis:
+      type: object
+      properties:
+        id:
+          type: integer
+        score:
+          type: integer
+        suggestions:
+          type: array
+          items:
+            type: string
+        strengths:
+          type: array
+          items:
+            type: string
+        skillGaps:
+          type: array
+          items:
+            type: string
+        targetRole:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required:
+        - id
+        - score
+        - suggestions
+        - strengths
+        - skillGaps
+        - createdAt
+
+    RoadmapGenerateBody:
+      type: object
+      properties:
+        targetRole:
+          type: string
+        currentSkills:
+          type: array
+          items:
+            type: string
+      required:
+        - targetRole
+
+    RoadmapStep:
+      type: object
+      properties:
+        skill:
+          type: string
+        description:
+          type: string
+        resources:
+          type: array
+          items:
+            type: string
+        completed:
+          type: boolean
+        order:
+          type: integer
+      required:
+        - skill
+        - description
+        - resources
+        - completed
+        - order
+
+    Roadmap:
+      type: object
+      properties:
+        id:
+          type: integer
+        role:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoadmapStep"
+        completedCount:
+          type: integer
+        totalCount:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - role
+        - steps
+        - completedCount
+        - totalCount
+        - createdAt
+
+    RoadmapProgressBody:
+      type: object
+      properties:
+        roadmapId:
+          type: integer
+        skillIndex:
+          type: integer
+        completed:
+          type: boolean
+      required:
+        - roadmapId
+        - skillIndex
+        - completed
+
+    Mentor:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        title:
+          type: string
+        company:
+          type: string
+        domain:
+          type: string
+        college:
+          type: string
+        experience:
+          type: integer
+        bio:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        avatarUrl:
+          type: ["string", "null"]
+        linkedinUrl:
+          type: ["string", "null"]
+        sessionsCount:
+          type: integer
+        rating:
+          type: number
+      required:
+        - id
+        - name
+        - title
+        - company
+        - domain
+        - college
+        - experience
+        - bio
+        - skills
+        - sessionsCount
+        - rating
+
+    ConnectionRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+        mentorId:
+          type: integer
+        userId:
+          type: integer
+        status:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - mentorId
+        - userId
+        - status
+        - createdAt
+
+    Referral:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        company:
+          type: string
+        domain:
+          type: string
+        location:
+          type: string
+        salary:
+          type: ["string", "null"]
+        description:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        referredBy:
+          type: string
+        referrerTitle:
+          type: string
+        postedAt:
+          type: string
+        deadline:
+          type: ["string", "null"]
+        applicantsCount:
+          type: integer
+      required:
+        - id
+        - title
+        - company
+        - domain
+        - location
+        - description
+        - skills
+        - referredBy
+        - referrerTitle
+        - postedAt
+        - applicantsCount
+
+    ReferralApplication:
+      type: object
+      properties:
+        id:
+          type: integer
+        referralId:
+          type: integer
+        userId:
+          type: integer
+        status:
+          type: string
+        appliedAt:
+          type: string
+        referral:
+          $ref: "#/components/schemas/Referral"
+      required:
+        - id
+        - referralId
+        - userId
+        - status
+        - appliedAt
+        - referral
+
+    InterviewStartBody:
+      type: object
+      properties:
+        role:
+          type: string
+        difficulty:
+          type: string
+      required:
+        - role
+
+    InterviewQuestion:
+      type: object
+      properties:
+        id:
+          type: integer
+        question:
+          type: string
+        category:
+          type: string
+      required:
+        - id
+        - question
+        - category
+
+    InterviewSession:
+      type: object
+      properties:
+        sessionId:
+          type: integer
+        role:
+          type: string
+        difficulty:
+          type: string
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/InterviewQuestion"
+      required:
+        - sessionId
+        - role
+        - difficulty
+        - questions
+
+    InterviewSubmitBody:
+      type: object
+      properties:
+        sessionId:
+          type: integer
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              questionId:
+                type: integer
+              answer:
+                type: string
+            required:
+              - questionId
+              - answer
+      required:
+        - sessionId
+        - answers
+
+    InterviewFeedback:
+      type: object
+      properties:
+        sessionId:
+          type: integer
+        overallScore:
+          type: integer
+        feedback:
+          type: string
+        strengths:
+          type: array
+          items:
+            type: string
+        improvements:
+          type: array
+          items:
+            type: string
+        questionFeedback:
+          type: array
+          items:
+            type: object
+            properties:
+              questionId:
+                type: integer
+              score:
+                type: integer
+              feedback:
+                type: string
+            required:
+              - questionId
+              - score
+              - feedback
+      required:
+        - sessionId
+        - overallScore
+        - feedback
+        - strengths
+        - improvements
+        - questionFeedback
+
+    DashboardSummary:
+      type: object
+      properties:
+        resumeScore:
+          type: ["integer", "null"]
+        roadmapProgress:
+          type: ["integer", "null"]
+        roadmapRole:
+          type: ["string", "null"]
+        mentorConnections:
+          type: integer
+        jobApplications:
+          type: integer
+        interviewsCompleted:
+          type: integer
+        skillGaps:
+          type: array
+          items:
+            type: string
+        recentActivity:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              description:
+                type: string
+              timestamp:
+                type: string
+            required:
+              - type
+              - description
+              - timestamp
+      required:
+        - mentorConnections
+        - jobApplications
+        - interviewsCompleted
+        - skillGaps
+        - recentActivity

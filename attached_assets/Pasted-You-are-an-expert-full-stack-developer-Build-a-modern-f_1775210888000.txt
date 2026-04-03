@@ -1,0 +1,155 @@
+You are an expert full-stack developer.
+
+Build a modern, fully functional website called **"PathNexis AI"** based on the following startup idea:
+
+--------------------------------------------------
+PROJECT OVERVIEW:
+PathNexis AI is a career guidance platform designed to help Tier 3 and Tier 4 college students bridge the gap between talent and opportunity.
+
+Core problem:
+- Students lack guidance
+- Poor resumes
+- No alumni network
+- No referrals
+
+Solution:
+An AI-powered ecosystem combining resume analysis, learning roadmaps, alumni connections, and referral marketplace.
+--------------------------------------------------
+
+TECH STACK:
+- Frontend: React (with Vite or Next.js)
+- Backend: Node.js + Express
+- Database: MongoDB
+- AI Integration: OpenAI API (mock functions if API key not available)
+- Styling: Tailwind CSS (modern UI)
+
+--------------------------------------------------
+
+PAGES TO BUILD:
+
+1. Landing Page
+- Hero section: "Bridging Talent to Opportunity"
+- Problem section (4 cards):
+  - No Guidance
+  - Poor Resume
+  - No Network
+  - No Referrals
+- Solution section explaining AI ecosystem
+- CTA button: "Get Started"
+
+2. Features Page
+Display cards for:
+- AI Resume Analyzer
+- Personalized Learning Roadmap
+- Alumni Network & Mentorship
+- Referral Marketplace
+- AI Mock Interviews
+
+3. Dashboard (after login)
+- Resume upload section
+- Resume score display (mock AI result)
+- Skill gap analysis
+- Recommended learning roadmap
+- Progress tracker
+
+4. Alumni Network Page
+- List of mentors (mock data)
+- Filter by domain (Software, Data, etc.)
+- "Connect" button
+
+5. Referral Marketplace
+- List of job openings
+- Apply button
+- Referral status
+
+6. Mock Interview Page
+- Start interview button
+- Show questions
+- Show feedback (mock AI)
+
+7. Pricing Page
+- Free plan
+- Premium mentorship plan
+- Recruiter access plan
+
+--------------------------------------------------
+
+AUTH SYSTEM:
+- Signup & Login (JWT based)
+- Store user profile:
+  - Name
+  - College
+  - Year
+  - Skills
+  - Resume
+
+--------------------------------------------------
+
+BACKEND FEATURES:
+Create REST APIs:
+- /auth/signup
+- /auth/login
+- /resume/analyze
+- /roadmap/generate
+- /mentors
+- /referrals
+- /interview/start
+
+--------------------------------------------------
+
+AI FEATURES (Mock if needed):
+- Resume analyzer:
+  Return:
+    score: 75
+    suggestions: ["Improve keywords", "Add projects"]
+
+- Roadmap generator:
+  Return:
+    role: "Frontend Developer"
+    skills: ["HTML", "CSS", "React"]
+
+- Mock interview:
+  Return:
+    feedback: "Good communication but improve technical depth"
+
+--------------------------------------------------
+
+UI DESIGN:
+- Clean, modern startup style
+- Use gradients, cards, and animations
+- Fully responsive (mobile + desktop)
+- Navbar + Footer
+
+--------------------------------------------------
+
+EXTRA FEATURES:
+- Loading animations
+- Toast notifications
+- Protected routes
+- Dummy data for testing
+
+--------------------------------------------------
+
+OUTPUT FORMAT:
+- Create full project structure
+- Separate frontend and backend folders
+- Include setup instructions
+- Include .env example
+
+--------------------------------------------------
+
+IMPORTANT:
+- Make the UI attractive like a real startup
+- Code should be clean and well-structured
+- Use reusable components
+- Add comments for understanding
+
+--------------------------------------------------
+
+REFERENCE IDEA:
+This project is based on a hackathon concept described as:
+"PathNexis AI bridges the gap between talent and opportunity for Tier 3/4 students using AI + mentorship + referrals ecosystem." :contentReference[oaicite:0]{index=0}
+
+--------------------------------------------------
+
+Now generate the complete project.
